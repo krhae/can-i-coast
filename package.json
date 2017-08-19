@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/krhae/can-i-coast#readme",
   "dependencies": {
-    "express": "^4.15.4"
+    "express": "^4.15.4",
+    "google-auth-library": "^0.10.0",
+    "googleapis": "^20.1.0"
   }
 }
