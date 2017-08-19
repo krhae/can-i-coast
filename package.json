@@ -4,6 +4,7 @@
   "description": "A server that sends text messages to pre-determined CAN phone numbers with an update on the current wind conditions, such that one may determine whether or not it is a good time to go for a ride and beat the King of the Hill on Strava ;)",
   "main": "/src/index.js",
   "scripts": {
+    "server": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/krhae/can-i-coast/issues"
   },
-  "homepage": "https://github.com/krhae/can-i-coast#readme"
+  "homepage": "https://github.com/krhae/can-i-coast#readme",
+  "dependencies": {
+    "express": "^4.15.4"
+  }
 }
