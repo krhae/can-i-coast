@@ -1,0 +1,19 @@
+{
+  "name": "can-i-coast",
+  "version": "1.0.0",
+  "description": "A server that sends text messages to pre-determined CAN phone numbers with an update on the current wind conditions, such that one may determine whether or not it is a good time to go for a ride and beat the King of the Hill on Strava ;)",
+  "main": "/src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krhae/can-i-coast.git"
+  },
+  "author": "Kelsey Hawley",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/krhae/can-i-coast/issues"
+  },
+  "homepage": "https://github.com/krhae/can-i-coast#readme"
+}
