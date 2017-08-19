@@ -5,3 +5,5 @@ cd can-i-coast
 npm install
 npm run server
 
+
+Reqs: gmail account 
