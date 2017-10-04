@@ -6,13 +6,17 @@ let readLine = require('readline')
 
 const SCOPES = [
   'https://mail.google.com/',
+  'https://www.googleapis.com/auth/gmail.modify',
   'https://www.googleapis.com/auth/gmail.compose',
   'https://www.googleapis.com/auth/gmail.send'
 ]
+
 const ROOT_PATH = process.cwd()
 const TOKEN_DIR = ROOT_PATH + '/.credentials/'
 const TOKEN_PATH = TOKEN_DIR + 'gmail_credentials.json'
 const CLIENT_SECRET_PATH = ROOT_PATH + '/src/config/client_secret.json'
+
+let auth = null
 
 fs.readFile(CLIENT_SECRET_PATH, function processClientSecrets(error, content) {
   if (error) {
@@ -20,7 +24,7 @@ fs.readFile(CLIENT_SECRET_PATH, function processClientSecrets(error, content) {
     return
   }
 
-  authorize(JSON.parse(content), listLabels)
+  authorize(JSON.parse(content))
 })
 
 /**
@@ -34,16 +38,24 @@ function authorize(credentials, cb) {
   let clientSecret = credentials.web.client_secret
   let clientId = credentials.web.client_id
   let redirectUrl = credentials.web.redirect_uris[0]
-  let auth = new GoogleAuth()
+  auth = new GoogleAuth()
   let oAuth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl)
 
   // Check for previously stored token
   fs.readFile(TOKEN_PATH, function(error, token) {
     if (error) {
-      getNewToken(oAuth2Client, cb)
+      if (cb) {
+        getNewToken(oAuth2Client, cb)
+      } else {
+        getNewToken(oAuth2Client)
+      }
     } else {
       oAuth2Client.credentials = JSON.parse(token)
-      cb(oAuth2Client)
+      console.log('Google API: Successfully auhtorized.')
+
+      if (cb) {
+        cb(oAuth2Client)
+      }
     }
   })
 }
@@ -79,9 +91,11 @@ function getNewToken(oAuth2Client, cb) {
         console.log('Error while trying to retrieve access token ', error)
         return
       }
-      oAuth2Client.credentials = token
+      oAuth2Client.setCredentials(token)
       storeToken(token)
-      cb(oAuth2Client)
+      if (cb) {
+        cb(oAuth2Client)
+      }
     })
   })
 }
@@ -135,3 +149,58 @@ function listLabels(auth) {
     }
   })
 }
+
+/**
+ * Format the message contents such that it can be sent to the Gmail API.
+ * Returns a formatted message in base 64 as the Gmail API expects.
+ *
+ * @param {String} senderEmail Email address of user whose credentials are in .credentials/gmail_credentials.json
+ * @param {String} recipientEmail The email address of the recipient
+ * @param {String} subject The message subject (optional)
+ * @param {String} messageBody The body of the eamil message (optional)
+ */
+function formatMessage(senderEmail, recipientEmail, subject, messageBody) {
+  if (!senderEmail) {
+    console.log('Error Formatting Message: No Authorized Sender Email Address.')
+    return
+  }
+
+  if (!recipientEmail) {
+    console.log('Error Formatting Message: No Recipient Email Address.')
+    return
+  }
+
+  let email = "From: " + senderEmail + "\r\n" +
+              "To: " + recipientEmail + "\r\n" +
+              "Subject: " + subject + + "\r\n" +
+              "Content-Type: text/html; charset=utf-8\r\n" +
+              "Content-Transfer-Encoding: base64\r\n\r\n" +
+              messageBody
+
+  return new Buffer(email, 'base64').toString('utf-8')
+}
+
+function sendMessage(base64EncodedEmail) {
+  if (!auth) {
+    console.log("Authorization not acquired.")
+    return
+  }
+
+  let gmail = Google.gmail('v1')
+
+  let options = {
+    auth: auth,
+    userId: 'me',
+    uploadType: 'media',
+    resource: {
+      raw: base64EncodedEmail
+    }
+  }
+
+  let request = gmail.users.messages.send(options)
+
+  request.execute()
+}
+
+
+module.exports = { formatMessage, sendMessage }
