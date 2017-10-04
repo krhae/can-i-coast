@@ -1,0 +1,9 @@
+{
+  "web-port": 9090,
+  "web-host": "0.0.0.0",
+  "debug-port": 5858,
+  "save-live-edit": true,
+  "preload": false,
+  "nodejs": ["--harmony"],
+  "stack-trace-limit": 50
+}
