@@ -1,12 +1,15 @@
 let CanadianProviders = {
   telus: [
-    '%s@msg.telus.com',
+    '%s@msg.telus.com'
   ],
   fido: [
-    '%s@fido.ca',
+    '%s@fido.ca'
   ],
   bellmobilitycanada: [
-    '%s@txt.bell.ca',
+    '%s@txt.bell.ca'
+  ],
+  freedommobile: [
+    '%s@@txt.freedommobile.ca'
   ]
 }
 

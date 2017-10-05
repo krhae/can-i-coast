@@ -1,6 +1,6 @@
 let USProviders = {
     tmobile: [
-    '%s@tmomail.net',
+    '%s@tmomail.net'
   ]
 }
 
