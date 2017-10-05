@@ -17,21 +17,19 @@ function init() {
       return console.log('Error Starting Server: ' + err)
     }
 
-    console.log('server is listening on port:' + PORT)
-    console.log('Sending msg...')
+    console.log('Server is listening on port:' + PORT + '\r\n')
     sendMessage()
-    console.log('Message sent.')
   })
 }
 
 function sendMessage() {
-  let SENDER = 'me'
+  let SENDER = 'kelseyr.hawley@gmail.com'
   let RECIPIENT = '12063315264@tmomail.net'
-  let SUBJECT = ''
-  let MESSAGE = 'HI KELSEY :)'
+  let SUBJECT = 'Dog Save America'
+  let MESSAGE = 'HI KELSEY :) 4'
 
   let formattedMsg = EmailUtil.formatMessage(SENDER, RECIPIENT, SUBJECT, MESSAGE)
-  EmailUtil.sendMessage(formattedMsg)
+  EmailUtil.authorizeAndSendMessage(formattedMsg)
 }
 
 // Run Server
