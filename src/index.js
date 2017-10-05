@@ -26,7 +26,7 @@ function sendMessage() {
   let SENDER = 'kelseyr.hawley@gmail.com'
   let RECIPIENT = '12063315264@tmomail.net'
   let SUBJECT = 'Dog Save America'
-  let MESSAGE = 'HI KELSEY :) 4'
+  let MESSAGE = 'HI KELSEY :)'
 
   let formattedMsg = EmailUtil.formatMessage(SENDER, RECIPIENT, SUBJECT, MESSAGE)
   EmailUtil.authorizeAndSendMessage(formattedMsg)

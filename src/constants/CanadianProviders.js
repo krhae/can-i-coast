@@ -9,7 +9,7 @@ let CanadianProviders = {
     '%s@txt.bell.ca'
   ],
   freedommobile: [
-    '%s@@txt.freedommobile.ca'
+    '%s@txt.freedommobile.ca'
   ]
 }
 
