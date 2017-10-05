@@ -1,5 +1,6 @@
 let http = require('http')
 let EmailUtil = require('./lib/GoogleApi')
+let Craigslist = require('./lib/CraigsListScraper')
 
 const PORT = 9090
 
@@ -20,6 +21,12 @@ function init() {
     console.log('Server is listening on port:' + PORT + '\r\n')
     sendMessage()
   })
+}
+
+function scrape() {
+  let queryParams = [10000, 'forester', 'awd', 250000]
+
+  Craigslist.scrape(...queryParams)
 }
 
 function sendMessage() {
