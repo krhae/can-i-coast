@@ -51,9 +51,9 @@ function _authorize(credentials, cb, args) {
   fs.readFile(TOKEN_PATH, function(error, token) {
     if (error) {
       if (cb) {
-        getNewToken(oAuth2Client, cb)
+        _getNewToken(oAuth2Client, cb)
       } else {
-        getNewToken(oAuth2Client)
+        _getNewToken(oAuth2Client)
       }
     } else {
       oAuth2Client.credentials = JSON.parse(token)
@@ -74,7 +74,7 @@ function _authorize(credentials, cb, args) {
  * @param {getEventsCallback} cb The callback to call with the authorized
  *     client.
  */
-function getNewToken(oAuth2Client, cb) {
+function _getNewToken(oAuth2Client, cb) {
   let authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES,
@@ -98,7 +98,7 @@ function getNewToken(oAuth2Client, cb) {
         return
       }
       oAuth2Client.credentials = token
-      storeToken(token)
+      _storeToken(token)
       if (cb) {
         cb(oAuth2Client)
       }
@@ -111,7 +111,7 @@ function getNewToken(oAuth2Client, cb) {
  *
  * @param {Object} token The token to store to disk.
  */
-function storeToken(token) {
+function _storeToken(token) {
   try {
     fs.mkdirSync(TOKEN_DIR)
   } catch (error) {
@@ -122,70 +122,6 @@ function storeToken(token) {
 
   fs.writeFile(TOKEN_PATH, JSON.stringify(token))
   console.log('Token stored at: ' + TOKEN_PATH)
-}
-
-/**
- * Lists the labels in the user's account.
- *
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
-function listLabels(auth) {
-  var gmail = Google.gmail('v1')
-
-  gmail.users.labels.list({
-    auth: auth,
-    userId: 'me'
-  },(error, response) => {
-    if (error) {
-      console.log(CONSOLE_COLORS['red'], ERRORS['GOOGLE_API'] + error)
-      return
-    }
-
-    let labels = response.labels
-
-    if (labels.length === 0) {
-      console.log('Google API: No labels found')
-    } else {
-      console.log('Google API: Labels:')
-
-      for (let i = 0; i < labels.length; i++) {
-        let label = labels[i]
-        console.log('- %s', label.name)
-      }
-    }
-  })
-}
-
-/**
- * Format the message contents such that it can be sent to the Gmail API.
- * Returns a formatted message in base 64 as the Gmail API expects.
- * Gmail API requires MIME email messages compliant with RFC 2822.
- *
- * @param {String} senderEmail Email address of user whose credentials are in .credentials/gmail_credentials.json
- * @param {String} recipientEmail The email address of the recipient
- * @param {String} subject The message subject (optional)
- * @param {String} messageBody The body of the eamil message (optional)
- */
-function formatMessage(senderEmail, recipientEmail, subject, messageBody) {
-  if (!senderEmail) {
-    console.log(CONSOLE_COLORS['red'], ERROR['MSG_NO_SENDER'])
-    return
-  }
-
-  if (!recipientEmail) {
-    console.log(CONSOLE_COLORS['red'], ERROR['MSG_NO_RECIPIENT'])
-    return
-  }
-
-  let email = "Content-Type: text/plain; charset=\"UTF-8\"\n" +
-              "MIME-Version: 1.0\n" +
-              "Content-Transfer-Encoding: 7bit\n" +
-              "to: " + recipientEmail + "\n" +
-              "from: " + senderEmail + "\n" +
-              "subject: " + subject + "\n\n" +
-              messageBody
-
-  return new Buffer(email).toString('base64').replace(/\+/g, '-').replace(/\//g, '_')
 }
 
 function _sendMessage(auth, base64EncodedEmail) {
@@ -221,7 +157,38 @@ function _sendMessage(auth, base64EncodedEmail) {
     console.log(CONSOLE_COLORS['red'], ERRORS['REQUEST_ERROR'] + e)
     console.log(CONSOLE_COLORS['red'], ERRORS['REQUEST_AUTH_ERROR'])
   }
+}
 
+/**
+ * Format the message contents such that it can be sent to the Gmail API.
+ * Returns a formatted message in base 64 as the Gmail API expects.
+ * Gmail API requires MIME email messages compliant with RFC 2822.
+ *
+ * @param {String} senderEmail Email address of user whose credentials are in .credentials/gmail_credentials.json
+ * @param {String} recipientEmail The email address of the recipient
+ * @param {String} subject The message subject (optional)
+ * @param {String} messageBody The body of the eamil message (optional)
+ */
+function formatMessage(senderEmail, recipientEmail, subject, messageBody) {
+  if (!senderEmail) {
+    console.log(CONSOLE_COLORS['red'], ERROR['MSG_NO_SENDER'])
+    return
+  }
+
+  if (!recipientEmail) {
+    console.log(CONSOLE_COLORS['red'], ERROR['MSG_NO_RECIPIENT'])
+    return
+  }
+
+  let email = "Content-Type: text/plain; charset=\"UTF-8\"\n" +
+              "MIME-Version: 1.0\n" +
+              "Content-Transfer-Encoding: 7bit\n" +
+              "to: " + recipientEmail + "\n" +
+              "from: " + senderEmail + "\n" +
+              "subject: " + subject + "\n\n" +
+              messageBody
+
+  return new Buffer(email).toString('base64').replace(/\+/g, '-').replace(/\//g, '_')
 }
 
 function authorizeAndSendMessage(base64EncodedEmail) {
